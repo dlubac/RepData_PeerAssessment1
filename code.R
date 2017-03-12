@@ -1,64 +1,37 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    fig_caption: yes
-    keep_md: yes
----
-
-## Required libraries
-```{r echo=TRUE}
 library(ggplot2)
-library(knitr)
-```
 
-
-## Loading and preprocessing the data
-```{r echo=TRUE}
+# Read/process data
 df <- read.csv("activity.csv")
 df$date <- as.Date(df$date)
-```
 
-## What is mean total number of steps taken per day?
-### Steps per day histogram
-```{r echo=TRUE}
+#==========================
+# Part 1
+# Steps per day histogram
 stepsPerDay <- aggregate(df$steps ~ df$date, df, sum, na.rm = TRUE)
 hist(stepsPerDay$`df$steps`, breaks = 10, xlab = "Steps", main = "Steps Per Day", col="#6cabe7")
-```
 
-### Mean steps per day
-```{r echo=TRUE}
+# Mean steps per day
 meanSteps <- mean(stepsPerDay$`df$steps`)
 meanSteps
-```
 
-### Median steps per day
-```{r echo=TRUE}
+# Median steps per day
 medianSteps <- median(stepsPerDay$`df$steps`)
 medianSteps
-```
 
-## What is the average daily activity pattern?
-### Time series for interval and average steps taken, averaged across all days
-```{r echo=TRUE}
+#==========================
+# Part 2
 avgStepsPerInt <- aggregate(df$steps ~ interval, df, mean)
 plot(avgStepsPerInt$interval, avgStepsPerInt$`df$steps`, type = "l", xlab="Interval", ylab = "Steps", main = "Average Steps Per Day")
-```
 
-### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-```{r echo=TRUE}
-maxSteps <- avgStepsPerInt[avgStepsPerInt$`df$steps` == max(avgStepsPerInt$`df$steps`),]
-maxSteps$interval
-```
+maxSteps <- avgStepsPerInt[avgStepsPerInt$`df$steps`==max(avgStepsPerInt$`df$steps`),]
+maxSteps
 
-## Imputing missing values
-### Duplicate original data
-```{r echo=TRUE}
+#==========================
+# Part 3
+# Duplicate original data
 dfFull <- df
-```
 
-### Calculate total missing values
-```{r echo=TRUE}
+# Calculate total missing values
 missingValueCount <- sum(is.na(dfFull$steps))
 missingValueCount
 
@@ -66,36 +39,25 @@ missingValues <- is.na(dfFull$steps)
 
 intervalAvg <- tapply(dfFull$steps, dfFull$interval, mean, na.rm = TRUE, simplify = TRUE)
 dfFull$steps[missingValues] <- intervalAvg[as.character(dfFull$interval[missingValues])]
-```
 
-### Make histogram
-```{r echo=TRUE}
+# Make histogram
 stepsPerDayFull <- aggregate(dfFull$steps ~ dfFull$date, dfFull, sum)
 hist(stepsPerDayFull$`dfFull$steps`, breaks = 10, xlab = "Steps", main = "Steps Per Day", col="#6cabe7")
-```
 
-### Mean steps per day
-```{r echo=TRUE}
+# Mean steps per day
 meanStepsFull <- mean(stepsPerDayFull$`dfFull$steps`)
 meanStepsFull
-```
 
-### Median steps per day
-```{r echo=TRUE}
+# Median steps per day
 medianStepsFull <- median(stepsPerDayFull$`dfFull$steps`)
 medianStepsFull
-```
 
-### Impact of imputing data
-```{r echo=TRUE}
+# Impact of imputing data
 summary(stepsPerDay)
 summary(stepsPerDayFull)
-```
 
-Imputing missing data increased the first quartile of steps and decreased the third quartile.
-
-## Are there differences in activity patterns between weekdays and weekends?
-```{r echo=TRUE}
+#==========================
+# Part 4
 dfFull$dayOfWeek <- weekdays(dfFull$date)
 dfFull$dateType <- ifelse(dfFull$dayOfWeek == "Saturday" | dfFull$dayOfWeek == "Sunday", "Weekend", "Weekday")
 
@@ -103,6 +65,9 @@ avgStepsPerIntFull <- aggregate(dfFull$steps ~ dfFull$dateType+dfFull$interval, 
 
 plot <- ggplot(dfFull, aes(dfFull$interval, dfFull$steps)) + geom_line() + facet_wrap(~ dfFull$dateType, ncol = 1, nrow = 2) + labs(title = "Average Steps By Interval and Day Type", x = "Interval", y = "Steps")
 
-plot
-```
+
+
+
+
+
 
